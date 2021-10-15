@@ -1,8 +1,14 @@
+import 'package:background_location/background_location.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:imei_plugin/imei_plugin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vtrak/DataService/APIClient.dart';
 import 'package:vtrak/Views/Components/BackgroundDecoration.dart';
 import 'package:vtrak/Views/Components/helper.dart';
 import 'package:vtrak/Views/SetPin.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 class Login extends StatefulWidget {
@@ -13,12 +19,39 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  bool task=false;
   String username='';
   String password='';
+  String mobile="";
+  final Geolocator geolocator = Geolocator()
+    ..forceAndroidLocationManager;
+
+  Position _currentPosition;
+
+  _getCurrentLocation() async{
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+      setState(() {
+        task=true;
+        login();
+        _currentPosition = position;
+        BackgroundLocation.startLocationService();
+      });
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold(key: _scaffoldKey,
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
@@ -74,19 +107,56 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 SizedBox(height: 20,),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: Colors.white
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 15.0, right: 15,top: 4,bottom: 4),
+                    child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (val){
+                        mobile=val;
+                      },
+                      decoration: InputDecoration(
+                          hintText: 'Mobile number',
+                          border: InputBorder.none
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20,),
 
                 Container(width: MediaQuery.of(context).size.width,
+                  height: 54,
                   child: RaisedButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0)
                     ),
                     color: color,
                     onPressed: (){
-                      Get.to(SetPin());
+                      if(username==""){
+                        _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Please enter username"));
+                      }
+                      else if(password==""){
+                        _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Please enter your password"));
+                      }
+                      else if(mobile==""){
+                        _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Please enter mobile number"));
+                      }
+                      else{
+                        _getCurrentLocation();
+
+                      }
                     },
                     child: Padding(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Text("LOGIN",
+                      padding: task?EdgeInsets.all(8.0):const EdgeInsets.all(14.0),
+                      child: task?CircularProgressIndicator(
+
+                        backgroundColor: Colors.white,
+                      )
+                          :Text("LOGIN",
                         style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -99,5 +169,41 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
+  }
+  login()async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    final result = await APIClient().login(username, password, mobile,
+        _currentPosition.latitude.toString(), _currentPosition.longitude.toString());
+
+    print(result);
+    print(_currentPosition.longitude.toString());
+    if(mounted){
+      setState(() {
+        task=false;
+      });
+    }
+    if(result=="failed"){
+      _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Failed"));
+    }
+    else if(result["Success"]==0){
+      _scaffoldKey.currentState.showSnackBar(APIClient.errorToast(result["Rmkrs"]));
+    }
+    else{
+      _scaffoldKey.currentState.showSnackBar(APIClient.successToast("Successfully registered"));
+      Future.delayed(
+          Duration(seconds: 2),
+              (){
+                pref.setString("isLogin", "true");
+                Get.to(SetPin());
+          }
+      );
+
+    }
+  }
+  getImei()async{
+    String imei = await ImeiPlugin.getImei();
+    List<String> multiImei = await ImeiPlugin.getImeiMulti(); //for double-triple SIM phones
+    String uuid = await ImeiPlugin.getId();
+    print(imei);
   }
 }

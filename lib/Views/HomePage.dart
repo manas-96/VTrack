@@ -1,12 +1,13 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:vtrak/Views/Components/BackgroundDecoration.dart';
 import 'package:vtrak/Views/Components/BottomNavigation.dart';
+import 'package:vtrak/Views/Components/vehicleList.dart';
 import 'package:vtrak/Views/Notifications.dart';
-
+import 'package:vtrak/Views/VehicleDetails.dart';
 import 'Components/helper.dart';
 
 
@@ -18,23 +19,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool showDetails=false;
+  bool showList=false;
 
   Future<bool> _onBackPressed() {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Are you sure?'),
-            content: Text('You are going to exit the application!!'),
+            title: Text('EXIT'),
+            content: Text('Do you really want to exit?'),
             actions: <Widget>[
-              FlatButton(
-                child: Text('NO'),
+              RaisedButton(
+                color: Colors.red,
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Text('NO',style: TextStyle(color: Colors.white),),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop(false);
                 },
               ),
-              FlatButton(
-                child: Text('YES'),
+              RaisedButton(
+                color: Colors.green,
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Text('YES',style: TextStyle(color: Colors.white),),
+                ),
                 onPressed: () {
                   //check?Navigator.pop(context):
                   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
@@ -105,10 +116,66 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
+              Positioned(
+                top: MediaQuery.of(context).size.height/2-20,
+                left: MediaQuery.of(context).size.width/2-20,
+                child: InkWell(
+                  onTap: (){
+                    setState(() {
+                      showList=!showList;
+                    });
+                  },
+                  child: Container(
+                    height: 40,width: 40,
+                    decoration: backgroundDecoration("images/vehicle_red.png"),
+                  ),
+                ),
+              ),
+              showList?Positioned(
+                bottom: 50,
+                child: InkWell(
+                  onTap: (){
+                    setState(() {
+                      showDetails=true;
+                      showList=false;
+                    });
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 120,
+                    child:  ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 5,
+                      itemBuilder: (context,index){
+                        return Padding(
+                          padding: EdgeInsets.only(left: 10, right: 10),
+                          child: vehicleList(
+                              Colors.green,
+                              "images/vehicle_green.png",
+                              context,
+                              false
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ):Container(),
+              showDetails?Positioned(
+                bottom: 0,
+                child: InkWell(
+                  onTap: (){
+                    setState(() {
+                      showDetails=false;
+                    });
+                  },
+                  child: VehicleDetails(),
+                ),
+              ):Container(),
             ],
           )
         ),
-          bottomNavigationBar:  bottomNavigation(1)
+          bottomNavigationBar:  bottomNavigation(1,context)
       ),
     );
   }

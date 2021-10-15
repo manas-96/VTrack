@@ -17,7 +17,7 @@ class _VehicleReportState extends State<VehicleReport> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar("VEHICLE REPORT"),
-      bottomNavigationBar: bottomNavigation(4),
+      bottomNavigationBar: bottomNavigation(4,context),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -25,71 +25,113 @@ class _VehicleReportState extends State<VehicleReport> {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: vehicleReportDecoration(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Select Report",style: vehicleReport,),
-                        Icon(Icons.arrow_forward_ios_sharp,color: Colors.grey,size: 24,),
-                      ],
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: 35,
+                      width: MediaQuery.of(context).size.width/2 -15,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: color)
+                      ),
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Select Report",style: TextStyle(fontWeight: FontWeight.bold),),
+                            Icon(Icons.keyboard_arrow_down_sharp,color: Colors.grey,)
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: vehicleReportDecoration(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Select Vehicle",style: vehicleReport,),
-                        Icon(Icons.arrow_forward_ios_sharp,color: Colors.grey,size: 24,),
-                      ],
+                    Container(
+                      height: 35,
+                      width: MediaQuery.of(context).size.width/2 -15,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: color)
+                      ),
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Select Vehicle",style: TextStyle(fontWeight: FontWeight.bold),),
+                            Icon(Icons.keyboard_arrow_down_sharp,color: Colors.grey,)
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: vehicleReportDecoration(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Select Report",style: vehicleReport,),
-                        Text("22/09/2021 00:00",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w300),)
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: vehicleReportDecoration(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Select Report",style: vehicleReport,),
-                        Text("22/09/2021 23:59",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w300),)
 
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
               ),
+              SizedBox(height: 10,),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: 35,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: color)
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("22/09/2021 00:00",style: TextStyle(fontWeight: FontWeight.w300,fontSize: 13),),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 35,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: color)
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("22/09/2021 00:00",style: TextStyle(fontWeight: FontWeight.w300,fontSize: 13),),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 35,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: Colors.blueGrey[900]
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("   Search   ",
+                              style: TextStyle(fontWeight: FontWeight.bold,fontSize: 13,color: Colors.white),),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  ],
+                ),
+              ),
+              SizedBox(height: 10,),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                color: Colors.grey,
+                height: 1.6,
+              )
             ],
           ),
         ),

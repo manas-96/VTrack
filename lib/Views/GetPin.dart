@@ -4,7 +4,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:vtrak/DataService/APIClient.dart';
+import 'package:vtrak/Views/Dashboard.dart';
 import 'package:vtrak/Views/HomePage.dart';
+import 'package:vtrak/Views/Login.dart';
 
 import 'Components/BackgroundDecoration.dart';
 import 'Components/helper.dart';
@@ -19,6 +22,7 @@ class GetPin extends StatefulWidget {
 }
 
 class _GetPinState extends State<GetPin> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   var onTapRecognizer;
 
   TextEditingController textEditingController = TextEditingController();
@@ -49,14 +53,14 @@ class _GetPinState extends State<GetPin> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold(key: _scaffoldKey,
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           decoration: backgroundDecoration("images/bg.png"),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(30.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -66,7 +70,7 @@ class _GetPinState extends State<GetPin> {
                   decoration: backgroundDecoration("images/logo_v-trak.png"),
                 ),
                 SizedBox(height: 20,),
-                Text("Enter Your Oin To Login",
+                Text("Enter Your Pin To Login",
                   style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 18),
                 ),
                 SizedBox(height: 20,),
@@ -82,13 +86,7 @@ class _GetPinState extends State<GetPin> {
                     obscureText: false,
                     obscuringCharacter: '*',
                     animationType: AnimationType.fade,
-                    validator: (v) {
-                      if (v.length < 3) {
-                        return "I'm from validator";
-                      } else {
-                        return null;
-                      }
-                    },
+
                     pinTheme: PinTheme(
                       activeColor: Colors.white,
                       inactiveColor: Colors.white,
@@ -97,9 +95,9 @@ class _GetPinState extends State<GetPin> {
                       selectedColor: Colors.white,
                       selectedFillColor: Colors.white,
                       shape: PinCodeFieldShape.box,
-                      borderRadius: BorderRadius.circular(5),
-                      fieldHeight: MediaQuery.of(context).size.height/20,
-                      fieldWidth: MediaQuery.of(context).size.width/9,
+                      borderRadius: BorderRadius.circular(10),
+                      fieldHeight: MediaQuery.of(context).size.height/18,
+                      fieldWidth: MediaQuery.of(context).size.width/8,
                       activeFillColor:Colors.white,
                     ),
                     cursorColor: Colors.black,
@@ -137,7 +135,7 @@ class _GetPinState extends State<GetPin> {
                     },
                   ),
                 ),
-                SizedBox(height: 20,),
+                SizedBox(height: 10,),
 
                 Container(width: MediaQuery.of(context).size.width,
                   child: RaisedButton(
@@ -146,10 +144,15 @@ class _GetPinState extends State<GetPin> {
                     ),
                     color: color,
                     onPressed: (){
-                      Get.to(HomePage());
+                      if(currentText==""){
+                        _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Please set your pin"));
+                      }
+                      else{
+                        getPin();
+                      }
                     },
                     child: Padding(
-                      padding: const EdgeInsets.all(14.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Text("LOGIN",
                         style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),
                       ),
@@ -160,7 +163,7 @@ class _GetPinState extends State<GetPin> {
                 SizedBox(height: 20,),
                 InkWell(
                   onTap: (){
-
+                    Get.to(Login());
                   },
                   child: Text("Forget PIN",
                     style: TextStyle(fontSize: 14, color: Colors.white,fontWeight: FontWeight.bold,decoration: TextDecoration.underline,),
@@ -172,5 +175,20 @@ class _GetPinState extends State<GetPin> {
         ),
       ),
     );
+  }
+  getPin()async{
+    final result = await APIClient().getPin(currentText);
+    if(result=="failed"){
+      _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Failed"));
+    }
+    else if(result["Success"]==0){
+      _scaffoldKey.currentState.showSnackBar(APIClient.errorToast(result["Rmkrs"]));
+    }
+    else{
+      print(result);
+      Get.to(Dashboard(
+        data: result["button_List"],
+      ));
+    }
   }
 }

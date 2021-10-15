@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:vtrak/Views/AlertScreen.dart';
 import 'package:vtrak/Views/Components/helper.dart';
 import 'package:vtrak/Views/HomePage.dart';
+import 'package:vtrak/Views/VehicleDetails.dart';
+import 'package:vtrak/Views/VehicleHistory.dart';
 import 'package:vtrak/Views/VehicleList.dart';
 import 'package:vtrak/Views/VehicleReport.dart';
 
 
-bottomNavigation(int index){
+bottomNavigation(int index, context){
   return BottomAppBar(
     child: Container(height: 60,color: Colors.white,
       child: Padding(
@@ -74,7 +77,7 @@ bottomNavigation(int index){
             InkWell(
               onTap: (){
                 if(index!=3){
-
+                  Get.to(VehicleHistory());
                 }
               },
               child: Container(
@@ -158,7 +161,7 @@ bottomNavigation(int index){
             InkWell(
               onTap: (){
                 if(index!=6){
-
+                  _onBackPressed(context);
                 }
               },
               child: Container(
@@ -189,4 +192,37 @@ bottomNavigation(int index){
       ),
     ),
   );
+}
+Future<bool> _onBackPressed(context) {
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('LOGOUT'),
+          content: Text('Do you really want to logout?'),
+          actions: <Widget>[
+            RaisedButton(
+              color: Colors.red,
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Text('NO',style: TextStyle(color: Colors.white),),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            RaisedButton(
+              color: Colors.green,
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Text('YES',style: TextStyle(color: Colors.white),),
+              ),
+              onPressed: () {
+                //check?Navigator.pop(context):
+                SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+              },
+            ),
+          ],
+        );
+      });
 }

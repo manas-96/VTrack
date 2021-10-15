@@ -17,7 +17,7 @@ class _AlertScreenState extends State<AlertScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar("ALERT SETTING"),
-      bottomNavigationBar: bottomNavigation(5),
+      bottomNavigationBar: bottomNavigation(5,context),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,

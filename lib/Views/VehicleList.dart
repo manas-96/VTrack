@@ -4,8 +4,11 @@ import 'package:vtrak/Views/Components/BottomNavigation.dart';
 import 'package:vtrak/Views/Components/appBar.dart';
 import 'package:vtrak/Views/Components/helper.dart';
 
+import 'Components/vehicleList.dart';
+
 class VehicleList extends StatefulWidget {
-  const VehicleList({Key key}) : super(key: key);
+  final bool axis;
+  const VehicleList({Key key, this.axis}) : super(key: key);
 
   @override
   _VehicleListState createState() => _VehicleListState();
@@ -17,7 +20,7 @@ class _VehicleListState extends State<VehicleList> {
     var w=MediaQuery.of(context).size.width/4.5;
     return Scaffold(
       appBar: appBar("VEHICLE LIST"),
-      bottomNavigationBar: bottomNavigation(2),
+      bottomNavigationBar: bottomNavigation(2,context),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -27,19 +30,50 @@ class _VehicleListState extends State<VehicleList> {
             children: [
               SizedBox(height: 10,),
               Container(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: 30,
+                      width: MediaQuery.of(context).size.width/2 -15,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: color)
+                      ),
+                      alignment: Alignment.centerRight,
+                      child: Icon(Icons.keyboard_arrow_down_sharp,color: Colors.grey,),
+                    ),
+                    Container(
+                      height: 30,
+                      width: MediaQuery.of(context).size.width/2 -15,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: color)
+                      ),
+                      alignment: Alignment.centerRight,
+                      child: Icon(Icons.keyboard_arrow_down_sharp,color: Colors.grey,),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10,),
+              Container(height: 40,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
                   border: Border.all(color: color)
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8.0, right: 8),
-                  child: TextFormField(
-                    onChanged: (val){
-
-                    },
-                    decoration: InputDecoration(
-                      suffixIcon: Icon(Icons.search,color: color,),
-                      border: InputBorder.none,
+                  child: Center(
+                    child: TextFormField(
+                      onChanged: (val){
+                        print(val);
+                      },
+                      decoration: InputDecoration(
+                        suffixIcon: Icon(Icons.search,color: color,),
+                        border: InputBorder.none,
+                      ),
                     ),
                   ),
                 ),
@@ -59,9 +93,9 @@ class _VehicleListState extends State<VehicleList> {
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 children: [
-                  vehicleList(Colors.green, "images/vehicle_green.png"),
+                  vehicleList(Colors.green, "images/vehicle_green.png",context,true),
                   SizedBox(height: 10,),
-                  vehicleList(Colors.red, "images/vehicle_red.png")
+                  vehicleList(Colors.red, "images/vehicle_red.png",context,true)
                 ],
               )
             ],
@@ -94,52 +128,5 @@ class _VehicleListState extends State<VehicleList> {
       ),
     );
   }
-  vehicleList(Color color1,String path){
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
 
-        border: Border(
-          left: BorderSide(color: color1,width: 3),
-          top: BorderSide(color: Colors.grey,width: 1),
-          bottom: BorderSide(color: Colors.grey,width: 1),
-          right: BorderSide(color: Colors.grey,width: 1),
-        )
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(width: MediaQuery.of(context).size.width-90,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("GBH1534J",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500),),
-                      Text(DateTime.now().toString(),style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500),),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 5,),
-                Text("0 KM/H | 0 KM | oSpd: 0",style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500),),
-                SizedBox(height: 5,),
-                Text("Driver Name",style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500),),
-                SizedBox(height: 5,),
-                Text("13, Kaki Bukit Road 4, Singapore 417807",style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500),),
-              ],
-            ),
-            Container(
-              height: 30,
-              width: 45,
-              decoration: backgroundDecoration(path),
-            )
-          ],
-        ),
-      )
-    );
-  }
 }
