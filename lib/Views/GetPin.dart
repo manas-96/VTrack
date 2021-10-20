@@ -178,6 +178,7 @@ class _GetPinState extends State<GetPin> {
   }
   getPin()async{
     final result = await APIClient().getPin(currentText);
+    print(result);
     if(result=="failed"){
       _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Failed"));
     }

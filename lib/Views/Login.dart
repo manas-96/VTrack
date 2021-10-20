@@ -1,3 +1,4 @@
+import 'package:android_intent/android_intent.dart';
 import 'package:background_location/background_location.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -8,9 +9,6 @@ import 'package:vtrak/DataService/APIClient.dart';
 import 'package:vtrak/Views/Components/BackgroundDecoration.dart';
 import 'package:vtrak/Views/Components/helper.dart';
 import 'package:vtrak/Views/SetPin.dart';
-import 'package:permission_handler/permission_handler.dart';
-
-
 class Login extends StatefulWidget {
   const Login({Key key}) : super(key: key);
 
@@ -29,19 +27,55 @@ class _LoginState extends State<Login> {
 
   Position _currentPosition;
 
+  enableGps()async{
+    bool isLocationEnabled = await Geolocator().isLocationServiceEnabled();
+    print(isLocationEnabled);
+    if(!isLocationEnabled){
+
+    }
+  }
   _getCurrentLocation() async{
-    geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-        .then((Position position) {
-      setState(() {
-        task=true;
-        login();
-        _currentPosition = position;
-        BackgroundLocation.startLocationService();
+    bool isLocationEnabled = await Geolocator().isLocationServiceEnabled();
+    print(isLocationEnabled);
+    if(!isLocationEnabled){
+      if (Theme.of(context).platform == TargetPlatform.android) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Can't get current location"),
+              content:
+              const Text('Please make sure you enable GPS and try again'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Ok'),
+                  onPressed: () {
+                    final AndroidIntent intent = AndroidIntent(
+                        action: 'android.settings.LOCATION_SOURCE_SETTINGS');
+                    intent.launch();
+                    Navigator.of(context, rootNavigator: true).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+    else{
+      geolocator
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+          .then((Position position) {
+        setState(() {
+          task=true;
+          login();
+          _currentPosition = position;
+          BackgroundLocation.startLocationService();
+        });
+      }).catchError((e) {
+        print(e);
       });
-    }).catchError((e) {
-      print(e);
-    });
+    }
   }
 
   @override

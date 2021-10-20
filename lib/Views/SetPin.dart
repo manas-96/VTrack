@@ -168,6 +168,7 @@ class _SetPinState extends State<SetPin> {
   }
   setPin()async{
     final result = await APIClient().setPin(currentText,'1');
+    print(result);
     if(result=="failed"){
       _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Failed"));
     }
