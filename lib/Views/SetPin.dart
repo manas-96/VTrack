@@ -13,8 +13,10 @@ import 'Components/helper.dart';
 
 
 class SetPin extends StatefulWidget {
+  final lat;
+  final long;
   final clientId;
-  const SetPin({Key key, this.clientId}) : super(key: key);
+  const SetPin({Key key, this.clientId, this.lat, this.long}) : super(key: key);
 
   @override
   _SetPinState createState() => _SetPinState();
@@ -167,7 +169,7 @@ class _SetPinState extends State<SetPin> {
     );
   }
   setPin()async{
-    final result = await APIClient().setPin(currentText,'1');
+    final result = await APIClient().setPin(currentText,widget.lat,widget.long);
     print(result);
     if(result=="failed"){
       _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Failed"));

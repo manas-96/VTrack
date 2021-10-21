@@ -228,7 +228,10 @@ class _LoginState extends State<Login> {
           Duration(seconds: 2),
               (){
                 pref.setString("isLogin", "true");
-                Get.to(SetPin());
+                Get.to(SetPin(
+                  lat: _currentPosition.latitude.toString(),
+                  long: _currentPosition.longitude.toString(),
+                ));
           }
       );
 

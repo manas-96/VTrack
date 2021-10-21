@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:android_intent/android_intent.dart';
+import 'package:background_location/background_location.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:vtrak/DataService/APIClient.dart';
@@ -34,9 +37,62 @@ class _GetPinState extends State<GetPin> {
   String currentText = "";
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
+  final Geolocator geolocator = Geolocator()
+    ..forceAndroidLocationManager;
 
+  Position _currentPosition;
+
+  enableGps()async{
+    bool isLocationEnabled = await Geolocator().isLocationServiceEnabled();
+    print(isLocationEnabled);
+    if(!isLocationEnabled){
+
+    }
+  }
+  _getCurrentLocation() async{
+    bool isLocationEnabled = await Geolocator().isLocationServiceEnabled();
+    print(isLocationEnabled);
+    if(!isLocationEnabled){
+      if (Theme.of(context).platform == TargetPlatform.android) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Can't get current location"),
+              content:
+              const Text('Please make sure you enable GPS and try again'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Ok'),
+                  onPressed: () {
+                    final AndroidIntent intent = AndroidIntent(
+                        action: 'android.settings.LOCATION_SOURCE_SETTINGS');
+                    intent.launch();
+                    Navigator.of(context, rootNavigator: true).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+    else{
+      geolocator
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+          .then((Position position) {
+        setState(() {
+          _currentPosition = position;
+          BackgroundLocation.startLocationService();
+        });
+      }).catchError((e) {
+        print(e);
+      });
+    }
+  }
   @override
   void initState() {
+    _getCurrentLocation();
     onTapRecognizer = TapGestureRecognizer()
       ..onTap = () {
         Navigator.pop(context);
@@ -177,7 +233,7 @@ class _GetPinState extends State<GetPin> {
     );
   }
   getPin()async{
-    final result = await APIClient().getPin(currentText);
+    final result = await APIClient().getPin(currentText,_currentPosition.latitude.toString(),_currentPosition.longitude.toString());
     print(result);
     if(result=="failed"){
       _scaffoldKey.currentState.showSnackBar(APIClient.errorToast("Failed"));
